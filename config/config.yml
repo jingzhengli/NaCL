@@ -1,0 +1,35 @@
+data:
+  dataset:
+    Office31:
+      num_classes: 31
+      iterations_per_epoch: 300 #10
+      acc_metric: total_mean
+      type: 'randomsizedcrop'
+
+    OfficeHome:
+      num_classes: 65
+      iterations_per_epoch: 500
+      acc_metric: total_mean
+      type: 'randomsizedcrop'
+
+    image-clef:
+      num_classes: 12
+      iterations_per_epoch: 100 #10
+      acc_metric: total_mean
+      type: 'randomsizedcrop'
+
+    visda-2017:
+      num_classes: 12
+      iterations_per_epoch: 1000
+      acc_metric: class_mean
+      type: 'randomsizedcrop'
+    CIFAR10:
+      num_classes: 10
+      iterations_per_epoch: 100
+      acc_metric: total_mean
+      type: 'randomsizedcrop'
+    CIFAR100:
+      num_classes: 100
+      iterations_per_epoch: 100
+      acc_metric: total_mean
+      type: 'randomsizedcrop'
