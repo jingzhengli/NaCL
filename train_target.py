@@ -7,7 +7,7 @@ import tqdm
 from torch import nn
 import torch.nn.functional as F
 import numpy as np
-from data.prepare_data import generate_dataloader_sc
+from data.prepare_data import generate_dataloader_sc,generate_dataloader_imagenetr
 from utils import summary_write_proj, summary_write_fig, AvgMeter, moment_update, compute_accuracy,calc_knn_graph, calc_topo_weights_with_components_idx
 from scipy.stats import mode
 
@@ -83,17 +83,14 @@ class Train:
         self.data_loader = {}
         self.data_iterator = {}
 
-        self.data_loader = generate_dataloader_sc(self.data_root,self.source,self.target,self.batch_size,self.num_workers,self.transform_type)
-
-        self.ntrain = len(self.data_loader['tgt_test'].dataset)
-        self.k_outlier = self.ntrain % (5*self.num_classes)
-
     def train(self):
         # start training
         self.total_progress_bar.write('Start training')
         while self.iteration < self.max_iter:
-
-            self.data_loader = generate_dataloader_sc(self.data_root,self.source,self.target,self.batch_size,self.num_workers,self.transform_type)
+            if self.source=='IN':
+                self.data_loader = generate_dataloader_imagenetr(self.data_root,self.source,self.target,self.batch_size,self.num_workers,self.transform_type)
+            else:
+                self.data_loader = generate_dataloader_sc(self.data_root,self.source,self.target,self.batch_size,self.num_workers,self.transform_type)
             for key in self.data_loader:
                 if self.data_loader[key] is not None and key is not 'tgt_data':
                     self.data_iterator[key] = iter(self.data_loader[key])
@@ -387,10 +384,16 @@ class Train:
 
     def get_sample(self, data_name):
         try:
-            (x_s, x_s_aug,x_s_aug2), labels_s, _ = next(self.data_iterator[data_name])
+            if self.source=='IN':  
+                (x_s, x_s_aug,x_s_aug2), labels_s = next(self.data_iterator[data_name])
+            else: 
+                (x_s, x_s_aug,x_s_aug2), labels_s, _ = next(self.data_iterator[data_name])
         except StopIteration:
             self.data_iterator[data_name] = iter(self.data_loader[data_name])
-            (x_s, x_s_aug,x_s_aug2), labels_s, _ = next(self.data_iterator[data_name])
+            if self.source=='IN': 
+                (x_s, x_s_aug,x_s_aug2), labels_s = next(self.data_iterator[data_name])
+            else: 
+                (x_s, x_s_aug,x_s_aug2), labels_s, _ = next(self.data_iterator[data_name])
         except TypeError:
             assert self.data_loader[data_name] is None
             return None

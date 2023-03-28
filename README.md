@@ -17,7 +17,7 @@ This is a PyTorch implementation of ["NaCL:Noise-Robust Cross-Domain Contrastive
     ```
 - Unsupervised DA on `ImageNet-scale` dataset:
     ```
-    python main.py --dataset_root ./data/ --src IN --tgt INR --contrast_dim 512 --module domain_loss --cw 1 --lr 0.003 --batch_size 32 --max_key_size 20 --max_iterations 50000
+    python main.py --dataset_root ./data/ --src IN --tgt INR --contrast_dim 256 --module domain_loss --cw 1 --lr 0.003 --batch_size 32 --max_key_size 20 --max_iterations 50000
     ```
 - Semi-supervised DA on `COVID-19` dataset:
     ```bash

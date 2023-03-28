@@ -160,7 +160,71 @@ def _select_image_process(DATA_TRANSFORM_TYPE):
         raise NotImplementedError
 
     return transforms_train_weak, transforms_train_strong1, transforms_train_strong2, transforms_test
+def generate_dataloader_imagenetr(data_root,source,target,batch_size,num_workers,transform_type):
+    dataloaders = {}
+    transforms_train_weak, transforms_train_strong1,transforms_train_strong2, transforms_test = _select_image_process(transform_type)
+    train_transform=MultipleApply([transforms_train_weak, transforms_train_strong1,transforms_train_strong2])
+    data_name='ImageNetR'
+    data_root = "/home/LAB/lijz19/code/safe_UDA/robust_contrastive_loss/data/"
 
+    source_train_dataset, target_train_dataset, val_dataset, target_test_dataset,source_cluster_dataset, target_cluster_dataset, num_classes = \
+        utils.get_dataset(data_name, data_root, source, target, train_transform, transforms_test)
+    #dataset = datasets.__dict__[cfg.DATASET.DATASET]
+    #source_train_dataset = dataset(root=cfg.DATASET.DATAROOT, task=source, download=True, transform=MultipleApply([transforms_train_weak, transforms_train_strong]))
+    #trans_test_dataset = dataset(root=base_path, task=args.target, download=True, transform=transforms_test)  
+    #source_train_dataset = dataset(root=dataroot_S, task=source, download=True, transform=MultipleApply([transforms_train_weak, transforms_train_strong]))
+    #target_test_dataset = dataset(root=cfg.DATASET.DATAROOT, task=val, download=True, transform=transforms_test)
+    #transforms_mec = _select_image_process_mec(cfg.DATA_TRANSFORM.TYPE)
+    ############ dataloader #############################
+    # source_train_dataset = datasets.ImageFolder(
+    #     dataroot_S,
+    #     transform=MultipleApply([transforms_train_weak, transforms_train_strong1,transforms_train_strong2])
+    # )
+    source_train_loader = torch.utils.data.DataLoader(
+        source_train_dataset, batch_size=batch_size, shuffle=True, drop_last=True,
+        num_workers=num_workers, pin_memory=False
+        )
+    target_train_loader = torch.utils.data.DataLoader(
+        target_train_dataset,
+        batch_size=batch_size, shuffle=True, drop_last=True,
+        num_workers=num_workers, pin_memory=False
+    )
+    # target_build_dataset = build_dataset(dataroot_T, transform=MultipleApply([transforms_train_weak, transforms_train_strong1,transforms_train_strong2]))
+    target_test_loader = torch.utils.data.DataLoader(
+        target_test_dataset,
+        batch_size=500, shuffle=False, drop_last= False,
+        num_workers=num_workers, pin_memory=False
+    )
+    # source_cluster_dataset = datasets.ImageFolder(
+    #     dataroot_S,
+    #     transforms_test
+    # )
+    # target_cluster_dataset = datasets.ImageFolder(
+    #     dataroot_T,
+    #     transforms_test
+    # )
+    source_cluster_loader = torch.utils.data.DataLoader(
+        source_cluster_dataset,
+        batch_size=1500, shuffle=True,
+        num_workers=num_workers, pin_memory=False
+    )
+    target_cluster_loader = torch.utils.data.DataLoader(
+        target_cluster_dataset,
+        batch_size=1024, shuffle=False,
+        num_workers=num_workers, pin_memory=False
+    )
+
+    dataloaders['src_train'] = source_train_loader
+    dataloaders['tgt_train'] = target_train_loader
+    dataloaders['tgt_data'] = target_train_dataset
+    
+    dataloaders['test'] = target_test_loader
+    dataloaders['src_test'] = source_cluster_loader
+    dataloaders['tgt_test'] = target_cluster_loader
+    dataloaders['tgt_conf'] = None
+    dataloaders['tgt_non_conf'] = None
+
+    return dataloaders
 def generate_dataloader_sc(data_root,source,target,batch_size,num_workers,transform_type):
     dataloaders = {}
     if data_root == '/home/LAB/lijz19/code/WUDA/AAAI2021/data1/domain_adaptation/Office31':
