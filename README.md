@@ -1,5 +1,5 @@
 ## NaCL:Noise-Robust Cross-Domain Contrastive Learning for Unsupervised Domain Adaptation
-Published in Machine Learning 2023.
+Published at Machine Learning 2023.
 ### Introduction
 This is a PyTorch implementation of ["NaCL:Noise-Robust Cross-Domain Contrastive Learning for Unsupervised Domain Adaptation"]. 
 
